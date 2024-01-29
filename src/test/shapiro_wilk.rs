@@ -22,10 +22,10 @@ use std::f64::consts::{FRAC_1_SQRT_2, FRAC_PI_3};
 ///     (complete samples)†. Biometrika, 52(3–4), 591–611. <https://doi.org/10.1093/biomet/52.3-4.591>
 #[derive(Debug, PartialEq, Clone)]
 pub struct ShapiroWilkTest {
-    p_value: f64,
-    estimate: f64,
-    weights: Vec<f64>,
-    status: ShapiroWilkStatus,
+    pub p_value: f64,
+    pub estimate: f64,
+    pub weights: Vec<f64>,
+    pub status: ShapiroWilkStatus,
 }
 
 /// Representation of non-fatal `IFAULT` codes (Royston, 1995).
