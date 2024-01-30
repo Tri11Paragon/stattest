@@ -2,6 +2,7 @@ use crate::distribution::ShapiroWilk;
 use statrs::distribution::{ContinuousCDF, Normal};
 use statrs::function::evaluate::polynomial;
 use statrs::statistics::Statistics;
+use std::borrow::BorrowMut;
 use std::cmp;
 use std::f64::consts::{FRAC_1_SQRT_2, FRAC_PI_3};
 
@@ -64,7 +65,12 @@ static C2: [f64; 6] = [0.0, 0.042981, -0.293762, -1.752461, 5.682633, -3.582633]
 static G: [f64; 2] = [-2.273, 0.459];
 
 impl ShapiroWilkTest {
-    /// Run the Shapiro-Wilk test on the sample `x`.
+    /// Run the Shaprio-Wilk test on sample 'x' but do not modify the underlying data (no sorting!)
+    pub fn new_copy(x: &[f64]) -> Result<ShapiroWilkTest, ShapiroWilkError> {
+        let mut sorted = x.to_owned();
+        Self::new(&mut sorted)
+    }
+    /// Run the Shapiro-Wilk test on the sample `x` by sorting on the provided array
     pub fn new(x: &mut [f64]) -> Result<ShapiroWilkTest, ShapiroWilkError> {
         x.sort_by(|a, b| a.partial_cmp(b).unwrap_or(cmp::Ordering::Equal));
         Self::new_sorted(x)
