@@ -65,21 +65,27 @@ static G: [f64; 2] = [-2.273, 0.459];
 
 impl ShapiroWilkTest {
     /// Run the Shapiro-Wilk test on the sample `x`.
-    pub fn new(x: &[f64]) -> Result<ShapiroWilkTest, ShapiroWilkError> {
-        let n = x.len();
-        let mut sorted = x.to_owned();
-        sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(cmp::Ordering::Equal));
+    pub fn new(x: &mut [f64]) -> Result<ShapiroWilkTest, ShapiroWilkError> {
+        x.sort_by(|a, b| a.partial_cmp(b).unwrap_or(cmp::Ordering::Equal));
+        Self::new_sorted(x)
+    }
+    
+     /// Run the Shapiro-Wilk test on the sample `sorted`.
+    pub fn new_sorted(sorted: &[f64]) -> Result<ShapiroWilkTest, ShapiroWilkError> {
+        let n = sorted.len();
+        
+        if n < 3 {
+            return Err(ShapiroWilkError::TooFew);
+        }
 
         let range = sorted.last().unwrap() - sorted[0];
 
         if range.lt(&SMALL) {
             return Err(ShapiroWilkError::NoDifference);
-        } else if n < 3 {
-            return Err(ShapiroWilkError::TooFew);
         }
 
         let weights = Self::get_weights(n);
-        let mean = (&sorted).mean();
+        let mean = sorted.mean();
 
         let (denominator, numerator): (f64, f64) = (0..n)
             .map(|i| {
